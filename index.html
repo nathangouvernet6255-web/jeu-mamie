@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeu Fête des Mamies 💖</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#ffe6f2;
+text-align:center;
+padding:20px;
+}
+
+.container{
+background:white;
+padding:20px;
+border-radius:20px;
+box-shadow:0 5px 20px rgba(0,0,0,0.1);
+max-width:500px;
+margin:auto;
+}
+
+button{
+background:#ff4da6;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:15px;
+margin:5px;
+font-size:16px;
+cursor:pointer;
+}
+
+input{
+padding:8px;
+border-radius:10px;
+border:1px solid #ccc;
+text-align:center;
+font-size:16px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(5,50px);
+gap:5px;
+justify-content:center;
+margin:15px 0;
+}
+
+.cell{
+width:50px;
+height:50px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:8px;
+}
+
+.wall{ background:#ff4da6; }
+.path{ background:#ffcce6; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>💖 Jeux Spécial Mamie 💖</h2>
+<div id="game"></div>
+</div>
+
+<script>
+
+const secretWord = "MA MAMIE CHERIE";
+let gameIndex = 0;
+
+function render(){
+const game = document.getElementById("game");
+game.innerHTML = "";
+
+if(gameIndex === 0){
+game.innerHTML = `
+<p>Bienvenue Mamie 💖</p>
+<button onclick="next()">Commencer</button>
+`;
+}
+
+else if(gameIndex === 1){
+renderMaze();
+}
+
+else if(gameIndex === 2){
+game.innerHTML = `
+<p>🔤 Quelle est la 6ème lettre de l'alphabet ?</p>
+<input id="alpha"/>
+<br>
+<button onclick="checkAlpha()">Valider</button>
+`;
+}
+
+else if(gameIndex === 3){
+game.innerHTML = `
+<p>➕ Combien font 3 + 5 ?</p>
+<input id="math"/>
+<br>
+<button onclick="checkMath()">Valider</button>
+`;
+}
+
+else if(gameIndex === 4){
+let shuffled = secretWord.split(" ").sort(()=>Math.random()-0.5).join(" ");
+game.innerHTML = `
+<p>🎉 Remets le mot dans l'ordre :</p>
+<h3>${shuffled}</h3>
+<p>Indice : C'est un message d'amour 💕</p>
+<button onclick="finish()">Valider</button>
+`;
+}
+
+else{
+game.innerHTML = `
+<h2>💖 BRAVO MAMIE 💖</h2>
+<p>Le mot secret était :</p>
+<h1>${secretWord}</h1>
+`;
+}
+
+}
+
+function next(){
+gameIndex++;
+render();
+}
+
+function checkAlpha(){
+let val = document.getElementById("alpha").value.toUpperCase();
+if(val === "F"){
+gameIndex++;
+render();
+}else{
+alert("Oups 😅 Essaie encore !");
+}
+}
+
+function checkMath(){
+let val = document.getElementById("math").value;
+if(val === "8"){
+gameIndex++;
+render();
+}else{
+alert("Oups 😅 Essaie encore !");
+}
+}
+
+function finish(){
+gameIndex++;
+render();
+}
+
+/* LABYRINTHE */
+
+let player = {row:0,col:0};
+const maze = [
+[0,0,1,0,0],
+[1,0,1,0,1],
+[1,0,0,0,1],
+[1,1,1,0,1],
+[1,1,1,0,2]
+];
+
+function renderMaze(){
+let html = `<p>🌀 Aide le demi-cœur à retrouver sa moitié ❤️</p>`;
+html += `<div class="grid">`;
+
+for(let i=0;i<maze.length;i++){
+for(let j=0;j<maze[i].length;j++){
+let cellClass = maze[i][j] === 1 ? "wall" : "path";
+let content = "";
+
+if(player.row===i && player.col===j) content="💔";
+else if(maze[i][j]===2) content="❤️";
+
+html += `<div class="cell ${cellClass}">${content}</div>`;
+}
+}
+
+html += `</div>`;
+
+html += `
+<button onclick="move('up')">⬆️</button><br>
+<button onclick="move('left')">⬅️</button>
+<button onclick="move('right')">➡️</button><br>
+<button onclick="move('down')">⬇️</button>
+`;
+
+document.getElementById("game").innerHTML = html;
+}
+
+function move(dir){
+let r = player.row;
+let c = player.col;
+
+if(dir==="up") r--;
+if(dir==="down") r++;
+if(dir==="left") c--;
+if(dir==="right") c++;
+
+if(r>=0 && r<maze.length && c>=0 && c<maze[0].length && maze[r][c]!==1){
+player.row=r;
+player.col=c;
+
+if(maze[r][c]===2){
+setTimeout(()=>{ gameIndex++; render(); },500);
+return;
+}
+}
+
+renderMaze();
+}
+
+render();
+
+</script>
+
+</body>
+</html>
